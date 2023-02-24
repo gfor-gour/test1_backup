@@ -1,0 +1,293 @@
+#include "iGraphics.h"
+#include<iostream>
+using namespace std;
+
+#define screenWidth 1000
+#define screenHeight 618
+#define JUMPLIMIT 150
+#define Blocknum 3
+#define backgroundspeed 2
+
+
+//:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::Idraw Here::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::://
+
+int backgroundimg[11]; 
+int blockimg[3];
+
+char run[6][20] = { "go\\c1.bmp", "go\\c2.bmp", "go\\c3.bmp", "go\\c4.bmp", "go\\c5.bmp", "go\\c6.bmp" };
+char jump[2][20] = { "go\\c7.bmp", "go\\c8.bmp"};
+
+char block[3][20] = { "go\\b11.bmp","go\\b22.bmp","go\\b33.bmp" };
+char bgimg[11][15] = { "go\\11.bmp", "go\\12.bmp", "go\\13.bmp", "go\\14.bmp", "go\\15.bmp", "go\\16.bmp", "go\\17.bmp", "go\\18.bmp", "go\\19.bmp", "go\\20.bmp","go\\21.bmp" };
+char gameover[1][15] = { "go\\end.bmp" };
+char sidebg[1][15] = { "go\\sidebg.bmp" };
+char homepage[1][15] = { "go\\home1.bmp" };
+char it[10];
+
+
+int X = 150;
+int Y = 80;
+int index = 0;
+int play = 0;
+int score = 0;
+
+bool jummp = false;
+bool jumpUp = false;
+bool jumpDown = false; 
+bool dead = false;
+int jumpcordinate = 50;
+
+int block1 = 900;
+
+
+string scoreText = to_string(score); //converting score to string
+
+	
+	//iText(30, 600, score,GLUT_BITMAP_9_BY_15);
+
+
+void iDraw()
+{
+	iClear();
+
+	if (!play){
+		iShowBMP(0, 0, homepage[0]);
+	}
+	
+	else if (play){
+		for (int i = 0; i < 11; i++){
+			iShowBMP(backgroundimg[i], 0, bgimg[i]);
+		}
+
+		
+
+		if (jummp)
+		{
+			if (jumpUp)
+			{
+				iShowBMP2(X, Y + jumpcordinate, jump[0], 0);
+			}
+
+			else {
+				iShowBMP2(X, Y + jumpcordinate, jump[1], 0);
+			}
+		}
+
+		else{
+
+			iShowBMP2(X, Y, run[index], 0);  // 0 is for black color ignoring
+		}
+
+		for (int i = 0; i < 3; i++){
+			iShowBMP(blockimg[i], 85, block[i]);
+		}
+
+		iShowBMP(0, 0, sidebg[0]);
+
+
+		iSetColor(255, 255, 255);
+		iText(0, 550, "Press SPACE_BAR",GLUT_BITMAP_HELVETICA_12);
+		iSetColor(255, 255, 255);
+		iText(20, 530, "to JUMP", GLUT_BITMAP_HELVETICA_12);
+
+		string scoreText = to_string(score); //converting score to string
+		for (int i = 0; i < scoreText.length(); i++)
+		{
+			it[i] = scoreText[i];
+		}
+
+		iSetColor(255, 255, 255);
+		iText(10, 510, "Score : ", GLUT_BITMAP_9_BY_15);
+		iText(10,480 , it, GLUT_BITMAP_9_BY_15);
+
+
+		if (dead){
+			iShowBMP(0, 0, gameover[0]);
+		}
+	
+	
+	}
+}
+
+
+
+void iMouseMove(int mx, int my)
+{
+
+}
+//*******************************************************************ipassiveMouse***********************************************************************//
+void iPassiveMouseMove(int mx, int my)
+{
+
+}
+
+void iMouse(int button, int state, int mx, int my)
+{
+
+	if (button == GLUT_LEFT_BUTTON)
+	{
+
+		play = 1;
+	}
+
+
+	/*if (button == GLUT_RIGHT_BUTTON && state == GLUT_DOWN)
+	{
+
+	}*/
+}
+
+
+
+
+void iKeyboard(unsigned char key)
+
+{
+	if (key == 'p' || key == 'P'){
+		play = 1;
+	}
+	if (key == ' ')
+	{
+
+		if (!jummp){
+			jummp = true;
+			jumpUp = true;
+		}
+	}
+
+
+}
+
+
+void iSpecialKeyboard(unsigned char key)
+{
+
+
+	if (key == GLUT_KEY_RIGHT)
+	{
+
+
+	}
+	else if (key == GLUT_KEY_LEFT)
+	{
+
+	}
+
+	else if (key == GLUT_KEY_HOME)
+	{
+
+	}
+
+}
+
+void change(){
+	index++;
+
+	if (index >= 6){
+		index = 0;
+	}
+
+
+	if (jump)
+	{
+		if (jumpUp)
+		{
+			score += 1;
+			jumpcordinate += 10;
+			if (jumpcordinate >= JUMPLIMIT)
+			{
+				jumpUp = false;
+			}
+		}
+
+		else
+		{
+			jumpcordinate -= 10;
+			if (jumpcordinate <= 0)
+			{
+				jummp = false;
+				jumpcordinate = 0;
+			}
+		}
+	}
+
+
+}
+
+void setALL(){
+	int sum = 100;
+	for (int i = 0; i < 11; i++){
+		backgroundimg[i] = 100 * i;
+	}
+} 
+
+void changebg()
+{
+	for (int i = 0; i < 11; i++)
+	{
+		backgroundimg[i] -= backgroundspeed;
+
+
+		if (backgroundimg[i] <= 0){
+			backgroundimg[i] = screenWidth;
+		}
+
+	}
+	 
+}
+
+
+
+void blockschange()
+{
+	for (int i = 0; i < 3; i++)
+	{
+		blockimg[i] -= backgroundspeed;
+			
+		//collision();
+		if (blockimg[0] <= 148)
+		{
+			blockimg[0] = 940 + 41 * rand() % 100;
+			
+				
+		}
+		if (blockimg[1] <= 148)
+		{
+			blockimg[1] = 890 + 41 * rand() %100;
+			
+		}
+		if (blockimg[2] <= 148)
+		{
+			blockimg[2] =1200 + 69* rand() % 100;
+			
+		}
+
+		//dead = false;
+
+		if (!jummp && ((X + 44) >= blockimg[0] || (X + 44) >= blockimg[1] || (X + 44) >= blockimg[2])){
+				dead = true;
+				
+			}
+		// dead = false;
+
+		}
+
+		
+	//dead = false;
+
+}
+
+
+int main()
+{
+	
+		setALL();
+
+		iSetTimer(150, change);
+		iSetTimer(25, changebg);
+		iSetTimer(25, blockschange);
+		iInitialize(screenWidth, screenHeight, "test1");
+
+		return 0;
+	
+}
